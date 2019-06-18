@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+
+  </head>
+  <body onload= "dataload()" >
+
+      <div class="container">
+        <div class="row pt-3 pb-3">
+          <div class="col-12">
+            <h1>Chat Bot</h1>
+            <button class="btn btn-outline-primary" type="button" id="send" >Send JSON Data</button>
+            <p><small><span id="avaiable"></span></small></p>
+           
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" id="message" placeholder="Type Here to Chat With Me.." aria-label="" aria-describedby="send">
+              <div class="input-group-append">
+                <button class="btn btn-outline-primary" type="button" id="send" onclick="dataload()">Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12" id="chat">
+        <p id="serverp" ></p>
+       </div>
+       {% if rtndata != ""%}
+       {{ rtndata }}
+       {% endif %}
+                 </div>
+        </div>
+      </div>
+
+
+</body>
+<script type="text/javascript">
+var userVal = {};
+var data = {{ file['questions']|tojson }};
+var text = 0;
+
+
+
+
+function dataload(){
+  loop1:
+  for(var i=0; i<data.length; i++){
+
+    loop2:
+    for(let key in data[i]){
+          if (key == "instruction"){
+            document.getElementById("serverp").innerHTML += "<div class='card text-light bg-dark border-0 shadow-sm p-0 mb-3'><div class='card-body'> Bot : " + data[i][key]   + "</div></div><p>";
+            textval = "inst"+text;
+            userVal[textval] = data[i][key];
+            delete data[i];
+      
+
+    }
+
+    if (key == "text"){
+      document.getElementById("serverp").innerHTML +=  "<div class='card text-light bg-dark border-0 shadow-sm p-0 mb-3'><div class='card-body'> Bot : " + data[i][key]   + "</div></div><p>";
+      textval = "text"+text;
+      userVal[textval] = data[i][key];
+      delete data[i][key];
+      break loop1;
+      
+    }
+    if (key == "var"){
+
+      tagdata = "input"+text;
+      userVal[tagdata] = message.value;
+      document.getElementById("serverp").innerHTML += "<div class='card bg-light border-0 shadow-sm p-0 mb-3'><div class='card-body'> ME : " + userVal[tagdata]   + "</div></div><p>";
+      message.value = "";
+      delete data[i];
+      text++;
+
+      
+  }
+    if (key == "options"){
+      tagdata = "option"+text;
+      userVal[tagdata] = data[i][key]; 
+     
+     
+    
+    }
+    if (key == "conditions"){
+    }
+  }
+}
+
+
+
+}
+
+
+$('#send').click(function() {
+        console.log(userVal);
+        $.ajax({
+          type: "POST",
+          contentType: "application/json;charset=utf-8",
+          url: "/jsondata",
+          traditional: "true",
+          data: JSON.stringify({'data':userVal}),
+          dataType: "json",
+          });
+    });
+
+</script>
+
+</html>
