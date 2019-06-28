@@ -13,7 +13,7 @@
 Note: Please Install a virtual environment if required
 `# apt install python3-venv`
 
-###### Execution Video is present in root directory
+
 
 
 ------------
